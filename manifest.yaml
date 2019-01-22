@@ -137,7 +137,9 @@ spec:
               mountPath: /var/www/html
           env:
             - name: MYSQL_DATABASE
-              value: nextcloud
+              value: "nextcloud"
+            - name: MYSQL_HOST
+              value: "mjgnctestsrv.mariadb.database.azure.com"
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
@@ -148,8 +150,6 @@ spec:
                 secretKeyRef:
                   name: ncdb
                   key: password
-            - name: MYSQL_HOST
-              value: mjgnctestsrv.mariadb.database.azure.com
             - name: NEXTCLOUD_ADMIN_USER
               valueFrom:
                 secretKeyRef:
@@ -161,11 +161,14 @@ spec:
                   name: ncadmin
                   key: password
       volumes:
-        - name: nc-storage
-          emptyDir: {}
         - name: config
           configMap:
             name: nginx-config
+        - name: nc-storage
+          azureFile:
+            secretName: azure-secret
+            shareName: nextcloud
+            readOnly: false
 ---
 apiVersion: v1
 kind: Service
