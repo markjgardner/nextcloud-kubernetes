@@ -22,9 +22,17 @@ data:
       upstream php-handler {
         server localhost:9000;
       }
-    
+
       server {
         listen 80;
+        listen [::]:80;
+        return 301 https://$server_name$request_uri;
+      }
+
+      server {
+        listen 443;
+        listen [::]:443;
+
         root /var/www/html/;
 
         add_header X-Content-Type-Options nosniff;
@@ -169,6 +177,9 @@ spec:
             secretName: azure-secret
             shareName: nextcloud
             readOnly: false
+        - name: ssl
+          secret: 
+            secretName: keypair
 ---
 apiVersion: v1
 kind: Service
