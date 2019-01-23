@@ -154,31 +154,6 @@ spec:
           volumeMounts:
             - name: nc-storage
               mountPath: /var/www/html
-          env:
-            - name: MYSQL_DATABASE
-              value: "nextcloud"
-            - name: MYSQL_HOST
-              value: "mjgnctestsrv.mariadb.database.azure.com"
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: ncdb
-                  key: username
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ncdb
-                  key: password
-            - name: NEXTCLOUD_ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: ncadmin
-                  key: username
-            - name: NEXTCLOUD_ADMIN_PASSSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ncadmin
-                  key: password
       volumes:
         - name: config
           configMap:
