@@ -30,8 +30,16 @@ data:
       }
 
       server {
-        listen 443;
-        listen [::]:443;
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        ssl_certificate /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+        ssl_session_timeout 10m;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
 
         root /var/www/html/;
 
@@ -130,12 +138,15 @@ spec:
           image: nginx
           ports:
             - containerPort: 80
+            - containerPort: 443
           volumeMounts:
             - name: config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
             - name: nc-storage
               mountPath: /var/www/html
+            - name: ssl
+              mountPath: /etc/nginx/ssl
         - name: nc
           image: nextcloud:15.0.2-fpm
           ports:
@@ -177,6 +188,11 @@ spec:
             secretName: azure-secret
             shareName: nextcloud
             readOnly: false
+        - name: nc-data
+          azureFile:
+            secretName: azure-secret
+            shareName: nextcloud-data
+            readOnly: false
         - name: ssl
           secret: 
             secretName: keypair
@@ -188,6 +204,13 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 443
   selector:
     app: nc-web
