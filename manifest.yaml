@@ -143,12 +143,16 @@ spec:
             - name: config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
+              readonly: true
             - name: nc-storage
               mountPath: /var/www/html
+              readonly: true
             - name: ssl
               mountPath: /etc/nginx/ssl
+              readonly: true
         - name: nc
           image: nextcloud:15.0.2-fpm
+          command: ["sh", "-c", "chmod -R 770 /var/www/html/data"]
           ports:
             - containerPort: 9000
           volumeMounts:
@@ -162,11 +166,6 @@ spec:
           azureFile:
             secretName: azure-secret
             shareName: nextcloud
-            readOnly: false
-        - name: nc-data
-          azureFile:
-            secretName: azure-secret
-            shareName: nextcloud-data
             readOnly: false
         - name: ssl
           secret: 
